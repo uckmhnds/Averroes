@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Averroes</string>
+
+    <string name="title_notes">Notes</string>
+    <string name="title_todos">To-dos</string>
+    <string name="title_add_note">Add Note</string>
+
+    <string name="hint_add_title">Add Title</string>
+    <string name="hint_add_note">Add a Note</string>
+    <string name="btn_add_note">Add</string>
+
+</resources>
