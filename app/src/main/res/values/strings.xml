@@ -1,12 +1,19 @@
 <resources>
     <string name="app_name">Averroes</string>
 
+    <string name="all_notes">All Notes</string>
+
     <string name="title_notes">Notes</string>
     <string name="title_todos">To-dos</string>
     <string name="title_add_note">Add Note</string>
 
-    <string name="hint_add_title">Add Title</string>
-    <string name="hint_add_note">Add a Note</string>
+    <string name="hint_title">Title</string>
     <string name="btn_add_note">Add</string>
 
+    <string name="category_travel">Travel</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_life">Life</string>
+    <string name="category_work">Work</string>
+    <string name="category_no_category">No category</string>
+    <string name="category_new">NEW</string>
 </resources>

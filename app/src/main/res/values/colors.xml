@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="travel">#ff4633</color>
+    <color name="personal">#ffc733</color>
+    <color name="life">#3fff33</color>
+    <color name="work">#334fff</color>
+    <color name="nocat">#FF000000</color>
 </resources>

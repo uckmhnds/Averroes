@@ -1,28 +1,38 @@
 package com.uckmhnds.averroes.view.fragments
 
+import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
+import com.uckmhnds.averroes.databinding.DialogNoteCategoriesBinding
 import com.uckmhnds.averroes.databinding.FragmentAddNoteBinding
 import com.uckmhnds.averroes.model.entities.Note
 import com.uckmhnds.averroes.viewmodel.AddNoteViewModel
 import com.uckmhnds.averroes.viewmodel.AddNoteViewModelFactory
 import java.util.*
 
-class AddNoteFragment : Fragment(), View.OnClickListener {
+class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFragment.NoteCategoriesDialogListener {
 
     private lateinit var binding: FragmentAddNoteBinding
+    private lateinit var navController: NavController
 
     private val viewModel: AddNoteViewModel by viewModels {
         AddNoteViewModelFactory((requireActivity().application as AverroesApplication).repository)
     }
 
     private lateinit var calendar: Calendar
+
+    private lateinit var dialog: NoteCategoriesDialogFragment
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,34 +45,59 @@ class AddNoteFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
 
+        navController       = Navigation.findNavController(view)
 
-        binding.btnAddNote.setOnClickListener(this)
+        // Top Item Container Listeners in order
+        binding.ivBackButton.setOnClickListener(this)
+        binding.ivPrevious.setOnClickListener(this)
+        binding.ivForward.setOnClickListener(this)
+        binding.ivAddNote.setOnClickListener(this)
 
+        // Middle Item Container Listener (Note category)
+        binding.llSelectCategory.setOnClickListener(this)
 
     }
 
     override fun onClick(v: View?) {
 
         if (v!=null){
-            when(v.id){
-                R.id.btn_add_note -> {
-                    val now = System.currentTimeMillis()
-                    val title   = binding.etAddTitle.text.toString()
-                    val text    = binding.etAddNote.text.toString()
-                    val id      = 0
-                    val date    = getDate() + " " + getTime()
-                    val ctgry   = "No category"
 
-                    val note    = Note(id, title, text, date, ctgry)
+            when(v.id){
+
+                R.id.iv_add_note -> {
+
+                    val title       = binding.etAddTitle.text.toString()
+                    val text        = binding.etAddNote.text.toString()
+                    val date        = getDate() + " " + getTime()
+                    val category    = binding.tvCategory.text.toString()
+
+                    val note    = Note(id = 0, title, text, date, category)
 
                     viewModel.insert(note)
 
                 }
+
+                R.id.iv_back_button -> {
+
+                    navController.navigate(R.id.action_navigation_add_note_to_navigation_notes)
+
+                }
+
+                R.id.ll_select_category -> {
+
+                    showNoteCategoriesDialogFragment()
+
+                }
+
+                R.id.iv_forward -> {
+
+                }
+
             }
         }
-
     }
 
     private fun getDate(): String{
@@ -107,5 +142,24 @@ class AddNoteFragment : Fragment(), View.OnClickListener {
         return "$hourString:$minuteString:$secondString"
 
     }
+
+    private fun showNoteCategoriesDialogFragment(){
+
+        // Create an instance of the dialog fragment and show it
+
+        dialog                      = NoteCategoriesDialogFragment()
+
+        dialog.show(childFragmentManager, "NoteCategoriesDialogFragment")
+
+    }
+
+    override fun onCategoryClick(category: String) {
+
+        binding.tvCategory.text     = category
+
+        dialog.dismiss()
+
+    }
+
 
 }

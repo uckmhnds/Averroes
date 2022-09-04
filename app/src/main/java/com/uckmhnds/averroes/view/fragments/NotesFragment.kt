@@ -53,7 +53,7 @@ class NotesFragment : Fragment(), View.OnClickListener {
 
 //        recyclerview                = binding.rvGridLayout
 
-        recyclerview                = binding.rvLinearLayout
+        recyclerview                = binding.rvNotes
 //        recyclerview.layoutManager  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         recyclerview.layoutManager  = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
 

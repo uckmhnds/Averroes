@@ -18,7 +18,48 @@
             android:layout_height="wrap_content"
             app:menu="@menu/popup_menu"
             android:background="?attr/colorPrimary"
-            app:title="All Notes"/>
+            app:title="">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+
+                <LinearLayout
+                    android:layout_gravity="start"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/tv_toolbar_all_note"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/all_notes"
+                        android:textStyle="bold"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/expand_more_icon"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:textSize="@dimen/_8sdp"
+                    android:layout_gravity="start"
+                    android:text="TEST"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
