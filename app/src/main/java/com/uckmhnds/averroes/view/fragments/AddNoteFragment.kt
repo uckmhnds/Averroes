@@ -3,22 +3,18 @@ package com.uckmhnds.averroes.view.fragments
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
-import com.uckmhnds.averroes.databinding.DialogNoteCategoriesBinding
 import com.uckmhnds.averroes.databinding.FragmentAddNoteBinding
 import com.uckmhnds.averroes.model.entities.Note
-import com.uckmhnds.averroes.viewmodel.AddNoteViewModel
-import com.uckmhnds.averroes.viewmodel.AddNoteViewModelFactory
+import com.uckmhnds.averroes.viewmodel.SharedNoteViewModel
+import com.uckmhnds.averroes.viewmodel.SharedNoteViewModelFactory
 import java.util.*
 
 class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFragment.NoteCategoriesDialogListener {
@@ -26,8 +22,8 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
     private lateinit var binding: FragmentAddNoteBinding
     private lateinit var navController: NavController
 
-    private val viewModel: AddNoteViewModel by viewModels {
-        AddNoteViewModelFactory((requireActivity().application as AverroesApplication).repository)
+    private val sharedViewModel: SharedNoteViewModel by activityViewModels{
+        SharedNoteViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
     }
 
     private lateinit var calendar: Calendar
@@ -38,8 +34,13 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         // Inflate the layout for this fragment
-        binding             = FragmentAddNoteBinding.inflate(inflater, container, false)
+        binding                     = FragmentAddNoteBinding.inflate(inflater, container, false)
+
+        val date                    = getDate() + " " + getTime()
+
+        binding.tvDate.text         = date
 
         return binding.root
     }
@@ -74,9 +75,9 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
                     val date        = getDate() + " " + getTime()
                     val category    = binding.tvCategory.text.toString()
 
-                    val note    = Note(id = 0, title, text, date, category)
+                    val note        = Note(id = 0, title, text, date, category)
 
-                    viewModel.insert(note)
+                    sharedViewModel.insert(note)
 
                 }
 
@@ -93,6 +94,10 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
                 }
 
                 R.id.iv_forward -> {
+
+                }
+
+                R.id.iv_previous -> {
 
                 }
 
@@ -153,13 +158,12 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
 
     }
 
-    override fun onCategoryClick(category: String) {
+    override fun onNoteCategoryClick(category: String) {
 
         binding.tvCategory.text     = category
 
         dialog.dismiss()
 
     }
-
 
 }

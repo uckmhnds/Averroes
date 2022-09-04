@@ -52,7 +52,7 @@ class NoteCategoriesDialogFragment : DialogFragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        adapter.onItemClick             =  { item -> listener.onCategoryClick(item) }
+        adapter.onItemClick             =  { item -> listener.onNoteCategoryClick(item) }
 
     }
 
@@ -60,7 +60,7 @@ class NoteCategoriesDialogFragment : DialogFragment() {
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     interface NoteCategoriesDialogListener {
-        fun onCategoryClick(category: String)
+        fun onNoteCategoryClick(category: String)
     }
 
 }

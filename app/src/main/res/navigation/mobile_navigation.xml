@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_navigation_notes_to_navigation_add_note"
             app:destination="@id/navigation_add_note" />
+        <action
+            android:id="@+id/action_navigation_notes_to_navigation_note_detail"
+            app:destination="@id/navigation_note_detail" />
     </fragment>
 
     <fragment
@@ -26,9 +29,19 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_note_detail"
+        android:name="com.uckmhnds.averroes.view.fragments.NoteDetailFragment"
+        android:label="@string/title_note_detail"
+        tools:layout="@layout/fragment_note_detail" >
+        <action
+            android:id="@+id/action_navigation_note_detail_to_navigation_notes"
+            app:destination="@id/navigation_notes" />
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_todo"
         android:name="com.uckmhnds.averroes.view.fragments.TodosFragment"
         android:label="@string/title_todos"
-        tools:layout="@layout/fragment_todo" />
+        tools:layout="@layout/fragment_todos" />
 
 </navigation>

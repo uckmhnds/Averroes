@@ -1,21 +1,21 @@
 package com.uckmhnds.averroes.view.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
 import com.uckmhnds.averroes.databinding.FragmentNotesBinding
+import com.uckmhnds.averroes.model.entities.Note
 import com.uckmhnds.averroes.view.adapters.NoteAdapter
-import com.uckmhnds.averroes.viewmodel.NotesViewModel
-import com.uckmhnds.averroes.viewmodel.NotesViewModelFactory
+import com.uckmhnds.averroes.viewmodel.SharedNoteViewModel
+import com.uckmhnds.averroes.viewmodel.SharedNoteViewModelFactory
+import java.util.*
 
 class NotesFragment : Fragment(), View.OnClickListener {
 
@@ -25,10 +25,12 @@ class NotesFragment : Fragment(), View.OnClickListener {
 
     private lateinit var adapter: NoteAdapter
 
-    lateinit var navController: NavController
+    private lateinit var navController: NavController
 
-    private val viewModel: NotesViewModel by viewModels {
-        NotesViewModelFactory((requireActivity().application as AverroesApplication).repository)
+    private lateinit var calendar: Calendar
+
+    private val sharedViewModel: SharedNoteViewModel by activityViewModels {
+        SharedNoteViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
     }
 
     override fun onCreateView(
@@ -50,7 +52,6 @@ class NotesFragment : Fragment(), View.OnClickListener {
         binding.mbAddButton.setOnClickListener(this)
         binding.mbDelButton.setOnClickListener(this)
 
-
 //        recyclerview                = binding.rvGridLayout
 
         recyclerview                = binding.rvNotes
@@ -58,14 +59,18 @@ class NotesFragment : Fragment(), View.OnClickListener {
         recyclerview.layoutManager  = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
 
 
-        viewModel.notes.observe(viewLifecycleOwner) {
+        sharedViewModel.notes.observe(viewLifecycleOwner) {
+
             adapter                 = NoteAdapter(activity, it)
             recyclerview.adapter    = adapter
-        }
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+            adapter.onCardClick     = { item ->
+
+                sharedViewModel.setSpecificNote(item)
+                navController.navigate(R.id.action_navigation_notes_to_navigation_note_detail)
+
+            }
+        }
     }
 
     override fun onClick(v: View?) {
@@ -73,11 +78,60 @@ class NotesFragment : Fragment(), View.OnClickListener {
         if (v!=null){
 
             when(v.id){
-                R.id.mb_add_button -> {navController.navigate(R.id.action_navigation_notes_to_navigation_add_note)}
-                R.id.mb_del_button -> {viewModel.deleteAll()}
+
+                R.id.mb_add_button -> {
+                    val date        = getDate() + " " + getTime()
+                    sharedViewModel.setSpecificNote(Note(0, "", "", date, "no category"))
+                    navController.navigate(R.id.action_navigation_notes_to_navigation_add_note)
+                }
+
+                R.id.mb_del_button -> {sharedViewModel.deleteAll()}
             }
 
         }
+
+    }
+
+    private fun getDate(): String{
+
+        calendar                    = Calendar.getInstance()
+
+        val year                    = calendar.get(Calendar.YEAR)
+        val month                   = calendar.get(Calendar.MONTH)
+        val day                     = calendar.get(Calendar.DAY_OF_MONTH)
+
+        return "${day}/${month}/${year}"
+    }
+
+    private fun getTime(): String{
+
+        calendar                    = Calendar.getInstance()
+
+        val hour                    = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute                  = calendar.get(Calendar.MINUTE)
+        val second                  = calendar.get(Calendar.SECOND)
+
+        var hourString              = ""
+        var minuteString            = ""
+        var secondString            = ""
+
+        hourString = if (hour < 10){
+            "0${hour}"
+        } else{
+            "$hour"
+        }
+        minuteString = if (minute < 10){
+            "0${minute}"
+        } else{
+            "$minute"
+        }
+        secondString = if (second < 10){
+            "0${second}"
+        } else{
+            "$second"
+        }
+
+        return "$hourString:$minuteString:$secondString"
 
     }
 

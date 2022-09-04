@@ -6,6 +6,7 @@
     <string name="title_notes">Notes</string>
     <string name="title_todos">To-dos</string>
     <string name="title_add_note">Add Note</string>
+    <string name="title_note_detail">Note Detail</string>
 
     <string name="hint_title">Title</string>
     <string name="btn_add_note">Add</string>

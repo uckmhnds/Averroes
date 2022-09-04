@@ -1,17 +1,11 @@
 package com.uckmhnds.averroes.view.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseExpandableListAdapter
-import android.widget.ExpandableListAdapter
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.uckmhnds.averroes.R
-import com.uckmhnds.averroes.databinding.DialogNoteCategoriesBinding
 import com.uckmhnds.averroes.databinding.DialogNoteCategoriesItemBinding
-import com.uckmhnds.averroes.databinding.NoteCardBinding
-import com.uckmhnds.averroes.model.entities.Note
 
 class NoteCategoryAdapter(
     private val activity: FragmentActivity?,

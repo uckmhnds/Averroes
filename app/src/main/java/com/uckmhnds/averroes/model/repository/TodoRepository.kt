@@ -1,13 +1,14 @@
 package com.uckmhnds.averroes.model.repository
 
 import androidx.annotation.WorkerThread
-import com.uckmhnds.averroes.model.database.TodoDao
+import com.uckmhnds.averroes.model.dao.TodoDao
 import com.uckmhnds.averroes.model.entities.Todo
 import kotlinx.coroutines.flow.Flow
 
 class TodoRepository(private val todoDao: TodoDao) {
 
-    val todos: Flow<List<Todo>>     = todoDao.getTodosById()
+    val todos: Flow<List<Todo>>     = todoDao.getTodosByIdAsc()
+    var size: Flow<Int>             = todoDao.getDataCount()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

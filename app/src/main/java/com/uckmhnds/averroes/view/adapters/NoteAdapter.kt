@@ -25,9 +25,8 @@ class NoteAdapter(
 
         init {
 
-            view.cv.setOnClickListener { onCardClick?.invoke(notes[adapterPosition]) }
+            cv.setOnClickListener { onCardClick?.invoke(notes[adapterPosition]) }
 
-//            view.ivDelete.setOnClickListener { onDeleteClick?.invoke(recentActions[adapterPosition]) }
         }
 
     }

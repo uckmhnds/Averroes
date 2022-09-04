@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.uckmhnds.averroes.databinding.NoteCardBinding
 import com.uckmhnds.averroes.databinding.TodoCardBinding
 import com.uckmhnds.averroes.model.entities.Todo
 
@@ -14,21 +13,21 @@ class TodoAdapter(
     private val todos : List<Todo>
 ): RecyclerView.Adapter<TodoAdapter.ViewHolder>()  {
 
+    var onCardClick: ((Todo) -> Unit)? = null
+
     inner class ViewHolder (view: TodoCardBinding): RecyclerView.ViewHolder(view.root){
 
-//        val cv                      = view.cv
-//        val tvTitle                 = view.tvTitle
-//        val tvNote                  = view.tvNote
-//        val tvDate                  = view.tvDate
+        val cv                      = view.cv
+        val tvTodo                  = view.tvTodo
+        val tvDate                  = view.tvDate
 
         // Set onClickListeners
 
-//        init {
-//
-//            view.cv.setOnClickListener { onCardClick?.invoke(notes[adapterPosition]) }
-//
-////            view.ivDelete.setOnClickListener { onDeleteClick?.invoke(recentActions[adapterPosition]) }
-//        }
+        init {
+
+            cv.setOnClickListener { onCardClick?.invoke(todos[adapterPosition]) }
+
+        }
 
     }
 
@@ -39,7 +38,11 @@ class TodoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        val todo                = todos[position]
+
+        holder.tvTodo.text      = todo.text
+        holder.tvDate.text      = todo.date
+
     }
 
     override fun getItemCount(): Int {
