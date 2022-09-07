@@ -32,6 +32,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                app:tint="@color/grey"
                 android:id="@+id/iv_previous"
                 android:src="@drawable/rotate_left_icon"
                 android:layout_width="wrap_content"
@@ -39,6 +40,7 @@
                 android:layout_marginEnd="@dimen/_5sdp"/>
 
             <ImageView
+                app:tint="@color/grey"
                 android:id="@+id/iv_forward"
                 android:src="@drawable/rotate_right_icon"
                 android:layout_width="wrap_content"
@@ -46,6 +48,7 @@
                 android:layout_marginEnd="@dimen/_5sdp"/>
 
             <ImageView
+                app:tint="@color/grey"
                 android:id="@+id/iv_add_note"
                 android:src="@drawable/done_icon"
                 android:layout_width="wrap_content"

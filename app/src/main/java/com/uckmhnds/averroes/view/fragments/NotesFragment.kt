@@ -1,13 +1,21 @@
 package com.uckmhnds.averroes.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryOwner
 import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
 import com.uckmhnds.averroes.databinding.FragmentNotesBinding
@@ -55,22 +63,11 @@ class NotesFragment : Fragment(), View.OnClickListener {
 //        recyclerview                = binding.rvGridLayout
 
         recyclerview                = binding.rvNotes
-//        recyclerview.layoutManager  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        recyclerview.layoutManager  = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
 
+        observeRecyclerViewLayoutManagerState(viewLifecycleOwner)
 
-        sharedViewModel.notes.observe(viewLifecycleOwner) {
+        observeNotes(viewLifecycleOwner)
 
-            adapter                 = NoteAdapter(activity, it)
-            recyclerview.adapter    = adapter
-
-            adapter.onCardClick     = { item ->
-
-                sharedViewModel.setSpecificNote(item)
-                navController.navigate(R.id.action_navigation_notes_to_navigation_note_detail)
-
-            }
-        }
     }
 
     override fun onClick(v: View?) {
@@ -135,4 +132,44 @@ class NotesFragment : Fragment(), View.OnClickListener {
 
     }
 
+    private fun observeRecyclerViewLayoutManagerState(viewLifecycleOwner: LifecycleOwner) {
+        sharedViewModel.listGridViewBoolean.observe(viewLifecycleOwner){
+
+            if (it){
+                recyclerview.layoutManager  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            }else{
+                recyclerview.layoutManager  = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
+            }
+
+        }
+    }
+
+    private fun observeNotes(viewLifecycleOwner: LifecycleOwner){
+
+        sharedViewModel.notes.observe(viewLifecycleOwner) {
+
+            adapter                 = NoteAdapter(activity, it)
+            recyclerview.adapter    = adapter
+
+            adapter.onCardClick     = { item ->
+
+                sharedViewModel.setSpecificNote(item)
+                navController.navigate(R.id.action_navigation_notes_to_navigation_note_detail)
+
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("test", "t1")
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        Log.i(savedInstanceState?.getString("test"), "thrown")
+    }
+
 }
+
+

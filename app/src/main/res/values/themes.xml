@@ -10,19 +10,39 @@
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/purple_500</item>
+        <item name="colorSecondaryVariant">@color/purple_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Secondary brand color. -->
+<!--        <item name="colorSecondary">@color/teal_200</item>-->
+<!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
+<!--        <item name="colorOnSecondary">@color/black</item>-->
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:actionBarStyle">@style/actionButtonStyle</item>
     </style>
+
+
     <style name="ShapeAppearanceOverlay.MyApp.Button.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="actionButtonStyle">
+        <item name="android:minWidth">32dip</item>
+        <item name="android:padding">20dip</item>
+    </style>
+
 
     <style name="Theme.ScrollingAct.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.ScrollingAct.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- THIS IS USED in AndroidManifest.xml
+        To Hide Top Status Bar on Splash Screen
+     -->
+    <style name="Theme.Averroes.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>

@@ -17,4 +17,9 @@
     <string name="category_work">Work</string>
     <string name="category_no_category">No category</string>
     <string name="category_new">NEW</string>
+
+    <string name="grid_view">Grid view</string>
+    <string name="list_view">List view</string>
+    <string name="delete_items">Delete items</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -1,10 +1,7 @@
 package com.uckmhnds.averroes.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.uckmhnds.averroes.model.entities.Note
 import com.uckmhnds.averroes.model.repository.NoteRepository
 import kotlinx.coroutines.launch
@@ -23,7 +20,7 @@ class SharedNoteViewModel(private val noteRepo: NoteRepository): ViewModel() {
         noteRepo.delete(note)
     }
 
-    fun update(note: Note)      = viewModelScope.launch {
+    fun update(note: Note)              = viewModelScope.launch {
         noteRepo.update(note)
     }
 
@@ -42,6 +39,22 @@ class SharedNoteViewModel(private val noteRepo: NoteRepository): ViewModel() {
 
     fun getSpecificNote(): Note{
         return specificNote!!
+    }
+
+    //////////// Note List/Grid view @NotesFragment
+
+    var listGridViewBoolean      = MutableLiveData(false)
+
+    fun showListView(){
+
+        listGridViewBoolean.postValue(true)
+
+    }
+
+    fun showGridView(){
+
+        listGridViewBoolean.postValue(false)
+
     }
 
 }

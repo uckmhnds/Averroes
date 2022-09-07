@@ -1,19 +1,12 @@
-package com.uckmhnds.averroes.view.fragments
+package com.uckmhnds.averroes.view.dialogs
 
-import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.databinding.DialogNoteCategoriesBinding
 import com.uckmhnds.averroes.utils.Constants
 import com.uckmhnds.averroes.view.adapters.NoteCategoryAdapter

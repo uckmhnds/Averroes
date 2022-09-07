@@ -5,12 +5,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.uckmhnds.averroes.view.activities.MainActivity">
 
-    <item android:id="@+id/new_game"
-        android:title="@string/title_notes"
+    <item
+        android:onClick="popUpMenuClick"
+        android:visible="true"
+        android:id="@+id/popup_menu_item_grid_view"
+        android:title="@string/grid_view"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/help"
-        android:title="@string/title_todos"
+    <item
+        android:onClick="popUpMenuClick"
+        android:visible="true"
+        android:id="@+id/popup_menu_item_list_view"
+        android:title="@string/list_view"
+        app:showAsAction="never"/>
+
+    <item
+        android:onClick="popUpMenuClick"
+        android:visible="true"
+        android:id="@+id/popup_menu_item_delete_items"
+        android:title="@string/delete_items"
+        app:showAsAction="never"/>
+
+    <item
+        android:onClick="popUpMenuClick"
+        android:visible="true"
+        android:id="@+id/popup_menu_item_settings"
+        android:title="@string/settings"
         app:showAsAction="never"/>
 
 </menu>

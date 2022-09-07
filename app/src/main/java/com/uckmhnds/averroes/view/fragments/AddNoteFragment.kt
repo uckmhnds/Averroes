@@ -1,8 +1,6 @@
 package com.uckmhnds.averroes.view.fragments
 
-import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +11,7 @@ import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
 import com.uckmhnds.averroes.databinding.FragmentAddNoteBinding
 import com.uckmhnds.averroes.model.entities.Note
+import com.uckmhnds.averroes.view.dialogs.NoteCategoriesDialogFragment
 import com.uckmhnds.averroes.viewmodel.SharedNoteViewModel
 import com.uckmhnds.averroes.viewmodel.SharedNoteViewModelFactory
 import java.util.*
@@ -158,6 +157,7 @@ class AddNoteFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFr
 
     }
 
+    // Overridden interface from NoteCategoriesDialogFragment
     override fun onNoteCategoryClick(category: String) {
 
         binding.tvCategory.text     = category
