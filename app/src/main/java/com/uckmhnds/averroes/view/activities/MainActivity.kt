@@ -1,16 +1,11 @@
 package com.uckmhnds.averroes.view.activities
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentOnAttachListener
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -165,6 +160,5 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
 
 }

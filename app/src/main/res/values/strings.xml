@@ -22,4 +22,6 @@
     <string name="list_view">List view</string>
     <string name="delete_items">Delete items</string>
     <string name="settings">Settings</string>
+
+    <string name="search_bar_hint">Search</string>
 </resources>

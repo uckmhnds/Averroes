@@ -3,19 +3,15 @@ package com.uckmhnds.averroes.view.fragments
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.core.os.bundleOf
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.SavedStateRegistryOwner
 import com.uckmhnds.averroes.R
 import com.uckmhnds.averroes.application.AverroesApplication
 import com.uckmhnds.averroes.databinding.FragmentNotesBinding
@@ -37,8 +33,14 @@ class NotesFragment : Fragment(), View.OnClickListener {
 
     private lateinit var calendar: Calendar
 
+    private lateinit var searchView: SearchView
+
     private val sharedViewModel: SharedNoteViewModel by activityViewModels {
         SharedNoteViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -47,7 +49,9 @@ class NotesFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View {
 
-        binding                = FragmentNotesBinding.inflate(inflater, container, false)
+        binding                 = FragmentNotesBinding.inflate(inflater, container, false)
+
+        searchView              = binding.svSearch
 
         return binding.root
     }
@@ -60,13 +64,27 @@ class NotesFragment : Fragment(), View.OnClickListener {
         binding.mbAddButton.setOnClickListener(this)
         binding.mbDelButton.setOnClickListener(this)
 
-//        recyclerview                = binding.rvGridLayout
-
         recyclerview                = binding.rvNotes
 
         observeRecyclerViewLayoutManagerState(viewLifecycleOwner)
 
         observeNotes(viewLifecycleOwner)
+
+//        Log.i(savedInstanceState?.getString("test"), "savedInstanceState Message @ NotesFragment Line69")
+
+        searchQueryListener()
+
+        sharedViewModel.searchResults.observe(viewLifecycleOwner){
+            if (it.isNotEmpty()){
+                val recyclerView: RecyclerView              = binding.rvNotesSearch
+                recyclerView.layoutManager                  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+                binding.nestedScrollView.visibility         = View.GONE
+                binding.nestedScrollViewSearch.visibility   = View.VISIBLE
+                adapter                 = NoteAdapter(activity, it)
+                recyclerView.adapter    = adapter
+            }
+            else return@observe
+        }
 
     }
 
@@ -160,15 +178,53 @@ class NotesFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("test", "t1")
+//    private fun observeSearchedNotes(searchText: String, viewLifecycleOwner: LifecycleOwner){
+//
+//        sharedViewModel.searchResults.observe(viewLifecycleOwner){
+//
+//            sharedViewModel.search(searchText)
+//
+//        }
+//
+//    }
+
+    private fun searchQueryListener(){
+
+        searchView.queryHint            = getString(R.string.search_bar_hint)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            // After clicking search button
+            override fun onQueryTextSubmit(query: String): Boolean {
+
+//                sharedViewModel.search(query)
+                return false
+            }
+            // While texting // input flow
+            override fun onQueryTextChange(newText: String): Boolean {
+                // This resets the notes list to display all notes if the query is
+                // cleared.
+                if (newText.isEmpty()){
+
+                    binding.nestedScrollView.visibility         = View.VISIBLE
+                    binding.nestedScrollViewSearch.visibility   = View.GONE
+
+                }else{
+
+                    sharedViewModel.search(newText)
+
+                }
+//                Log.i(newText, newText)
+//                Log.i("clear", "clear")
+                return false
+            }
+        })
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        Log.i(savedInstanceState?.getString("test"), "thrown")
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
     }
+
+
 
 }
 

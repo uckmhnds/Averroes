@@ -19,10 +19,18 @@
             app:layout_constraintTop_toTopOf="parent"
             >
 
-            <EditText
-                android:id="@+id/et_search"
-                android:hint="Search notes"
-                android:padding="@dimen/_2sdp"
+<!--            <EditText-->
+<!--                android:id="@+id/et_search"-->
+<!--                android:hint="Search notes"-->
+<!--                android:padding="@dimen/_2sdp"-->
+<!--                android:background="@null"-->
+<!--                android:drawableStart="@drawable/search_icon"-->
+<!--                android:textSize="@dimen/_12sdp"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+            <SearchView
+                android:id="@+id/sv_search"
                 android:background="@null"
                 android:drawableStart="@drawable/search_icon"
                 android:textSize="@dimen/_12sdp"
@@ -50,6 +58,26 @@
                 android:layout_height="match_parent"/>
 
         </androidx.core.widget.NestedScrollView>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view_search"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/_5sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cv_search"
+        android:orientation="vertical"
+        >
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_notes_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/mb_del_button"

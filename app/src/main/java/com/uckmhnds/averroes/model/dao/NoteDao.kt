@@ -13,7 +13,10 @@ interface NoteDao {
     @Query("SELECT COUNT(id) FROM notes")
     fun getDataCount(): Flow<Int>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("SELECT * FROM notes WHERE title LIKE :searchText OR text LIKE :searchText")
+    fun search(searchText: String): List<Note>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(note: Note)
 
     @Query("DELETE FROM notes")

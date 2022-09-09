@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.uckmhnds.averroes.model.entities.Note
 import com.uckmhnds.averroes.model.repository.NoteRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SharedNoteViewModel(private val noteRepo: NoteRepository): ViewModel() {
@@ -24,9 +26,15 @@ class SharedNoteViewModel(private val noteRepo: NoteRepository): ViewModel() {
         noteRepo.update(note)
     }
 
-    val notes: LiveData<List<Note>>     = noteRepo.notes.asLiveData()
+    fun search(searchText: String)      = CoroutineScope(Dispatchers.IO).launch {
+        noteRepo.search(searchText)
+    }
 
-    var size: LiveData<Int>             = noteRepo.size.asLiveData()
+    val notes: LiveData<List<Note>>         = noteRepo.notes.asLiveData()
+
+    var size: LiveData<Int>                 = noteRepo.size.asLiveData()
+
+    val searchResults: LiveData<List<Note>>            = noteRepo.searchResults
 
 
     ///////////////////////////////////////////
