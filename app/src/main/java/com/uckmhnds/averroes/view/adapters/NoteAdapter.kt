@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.uckmhnds.averroes.databinding.NoteCardBinding
-import com.uckmhnds.averroes.model.entities.Note
+import com.uckmhnds.averroes.data.room.entities.Note
 
 class NoteAdapter(
     private val activity: FragmentActivity?,
@@ -16,7 +16,7 @@ class NoteAdapter(
 
     inner class ViewHolder (view: NoteCardBinding): RecyclerView.ViewHolder(view.root){
 
-        val cv                      = view.cv
+        private val cv              = view.cv
         val tvTitle                 = view.tvTitle
         val tvNote                  = view.tvNote
         val tvDate                  = view.tvDate

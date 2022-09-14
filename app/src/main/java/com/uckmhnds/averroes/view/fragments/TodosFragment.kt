@@ -1,139 +1,101 @@
 package com.uckmhnds.averroes.view.fragments
 
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavController
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.uckmhnds.averroes.R
-import com.uckmhnds.averroes.application.AverroesApplication
+import com.uckmhnds.averroes.data.preferences.AppPreferences
+import com.uckmhnds.averroes.data.room.entities.Todo
 import com.uckmhnds.averroes.databinding.FragmentTodosBinding
-import com.uckmhnds.averroes.model.entities.Todo
-import com.uckmhnds.averroes.view.adapters.TodoAdapter
-import com.uckmhnds.averroes.viewmodel.*
-import java.util.*
+import com.uckmhnds.averroes.domain.model.TodoModel
+import com.uckmhnds.averroes.view.adapters.TodoCardAdapter
+import com.uckmhnds.averroes.view.fragments.base.BaseFragment
+import com.uckmhnds.averroes.viewmodel.TodosViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TodosFragment : Fragment(), View.OnClickListener {
+@AndroidEntryPoint
+class TodosFragment : BaseFragment<TodosViewModel, FragmentTodosBinding>(FragmentTodosBinding::inflate) {
 
-    private lateinit var binding: FragmentTodosBinding
+    override val viewModel by viewModels<TodosViewModel>()
 
-    private lateinit var recyclerview: RecyclerView
+    @Inject
+    lateinit var preferences: AppPreferences
 
-    private lateinit var adapter: TodoAdapter
-
-    private lateinit var navController: NavController
-
-    private lateinit var calendar: Calendar
-
-    private val sharedViewModel: SharedTodoViewModel by activityViewModels {
-        SharedTodoViewModelFactory((requireActivity().application as AverroesApplication).todoRepository)
+    private val todoCardAdapter by lazy {
+        TodoCardAdapter(
+            onTodoCardClick = { todoModel ->
+                TodoModel(
+                id = todoModel.id,
+                text = todoModel.text,
+                date = todoModel.date,
+                done = todoModel.done
+                )
+            }
+        )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        binding                         = FragmentTodosBinding.inflate(inflater, container, false)
-
-        recyclerview                    = binding.rvTodos
-
-        recyclerview.layoutManager      = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-
-        sharedViewModel.notes.observe(viewLifecycleOwner){
-            adapter                     = TodoAdapter(activity, it)
-            recyclerview.adapter        = adapter
+    override fun setupViews() {
+        binding.apply {
+            rvTodos.adapter         = todoCardAdapter
+            rvTodos.layoutManager   = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         }
-
-        binding.mbAddButton.setOnClickListener(this)
-        binding.mbDelButton.setOnClickListener(this)
-
-        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        recyclerview            = binding.rvTodos
-
-    }
-
-    private fun getDate(): String{
-
-        calendar                    = Calendar.getInstance()
-
-        val year                    = calendar.get(Calendar.YEAR)
-        val month                   = calendar.get(Calendar.MONTH)
-        val day                     = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return "${day}/${month}/${year}"
-    }
-
-    private fun getTime(): String{
-
-        calendar                    = Calendar.getInstance()
-
-        val hour                    = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute                  = calendar.get(Calendar.MINUTE)
-        val second                  = calendar.get(Calendar.SECOND)
-
-        var hourString              = ""
-        var minuteString            = ""
-        var secondString            = ""
-
-        hourString = if (hour < 10){
-            "0${hour}"
-        } else{
-            "$hour"
+    override fun setupListeners() {
+        binding.apply {
+            mbAddButton.setOnClickListener { addButtonAction() }
+            mbDelButton.setOnClickListener { delButtonAction() }
         }
-        minuteString = if (minute < 10){
-            "0${minute}"
-        } else{
-            "$minute"
-        }
-        secondString = if (second < 10){
-            "0${second}"
-        } else{
-            "$second"
-        }
-
-        return "$hourString:$minuteString:$secondString"
-
     }
 
-    override fun onClick(view: View?) {
+    override fun setupObservers() {
+        observeTodoRoomDatabase()
+        observeTodoNumber()
+    }
 
-        if (view != null){
+    private fun addButtonAction(){
+        viewModel.pushTodo(
+            Todo(
+                id = 0,
+                text = "TEST",
+                date = getTime() + " " + getDate(),
+                done = false
+            )
+        )
+    }
 
-            when(view.id){
+    private fun delButtonAction(){
+        lifecycleScope.launch{
 
-                R.id.mb_add_button -> {
-                    val date        = getDate() + " " + getTime()
-                    val todo        = Todo(0, "test", date, false)
+            viewModel.deleteAll()
 
-                    sharedViewModel.insert(todo)
+        }
+    }
 
-                }
+    private fun observeTodoRoomDatabase(){
+        lifecycleScope.launch{
 
-                R.id.mb_del_button -> {
+            viewModel.todos.observe(viewLifecycleOwner){
 
-                    Log.i("click", "ok")
-
-                    sharedViewModel.deleteAll()
-
-                }
+                    todoModelList -> todoCardAdapter.submitList(todoModelList)
 
             }
 
         }
+    }
 
+    private fun observeTodoNumber(){
+
+        lifecycleScope.launch {
+
+            viewModel.size.observe(viewLifecycleOwner){
+
+                    numberOfTodos -> preferences.setTodoNumber(numberOfTodos)
+
+            }
+
+        }
     }
 
 }

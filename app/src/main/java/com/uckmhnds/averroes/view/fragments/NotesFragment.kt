@@ -1,230 +1,163 @@
 package com.uckmhnds.averroes.view.fragments
 
-import android.os.Bundle
+import android.content.SharedPreferences
 import android.util.Log
-import android.view.*
 import android.widget.SearchView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.uckmhnds.averroes.R
-import com.uckmhnds.averroes.application.AverroesApplication
+import com.uckmhnds.averroes.data.preferences.AppPreferenceKeys
+import com.uckmhnds.averroes.data.preferences.AppPreferences
 import com.uckmhnds.averroes.databinding.FragmentNotesBinding
-import com.uckmhnds.averroes.model.entities.Note
-import com.uckmhnds.averroes.view.adapters.NoteAdapter
-import com.uckmhnds.averroes.viewmodel.SharedNoteViewModel
-import com.uckmhnds.averroes.viewmodel.SharedNoteViewModelFactory
-import java.util.*
+import com.uckmhnds.averroes.domain.model.NoteModel
+import com.uckmhnds.averroes.view.adapters.NoteCardAdapter
+import com.uckmhnds.averroes.view.fragments.base.BaseFragment
+import com.uckmhnds.averroes.viewmodel.NotesViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NotesFragment : Fragment(), View.OnClickListener {
+@AndroidEntryPoint
+class NotesFragment : BaseFragment<NotesViewModel, FragmentNotesBinding>(FragmentNotesBinding::inflate) {
 
-    private lateinit var binding: FragmentNotesBinding
+    override val viewModel  by viewModels<NotesViewModel>()
 
-    private lateinit var recyclerview: RecyclerView
+    @Inject
+    lateinit var preferences: AppPreferences
 
-    private lateinit var adapter: NoteAdapter
-
-    private lateinit var navController: NavController
-
-    private lateinit var calendar: Calendar
-
-    private lateinit var searchView: SearchView
-
-    private val sharedViewModel: SharedNoteViewModel by activityViewModels {
-        SharedNoteViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        binding                 = FragmentNotesBinding.inflate(inflater, container, false)
-
-        searchView              = binding.svSearch
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        navController           = Navigation.findNavController(view)
-
-        binding.mbAddButton.setOnClickListener(this)
-        binding.mbDelButton.setOnClickListener(this)
-
-        recyclerview                = binding.rvNotes
-
-        observeRecyclerViewLayoutManagerState(viewLifecycleOwner)
-
-        observeNotes(viewLifecycleOwner)
-
-//        Log.i(savedInstanceState?.getString("test"), "savedInstanceState Message @ NotesFragment Line69")
-
-        searchQueryListener()
-
-        sharedViewModel.searchResults.observe(viewLifecycleOwner){
-            if (it.isNotEmpty()){
-                val recyclerView: RecyclerView              = binding.rvNotesSearch
-                recyclerView.layoutManager                  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-                binding.nestedScrollView.visibility         = View.GONE
-                binding.nestedScrollViewSearch.visibility   = View.VISIBLE
-                adapter                 = NoteAdapter(activity, it)
-                recyclerView.adapter    = adapter
+    private val noteCardAdapter by lazy {
+        NoteCardAdapter(
+            onNoteCardClick = {
+                noteModel -> navigateWithAction(
+                    NotesFragmentDirections.
+                    actionNotesToNoteDetail(
+                        NoteModel(
+                            id = noteModel.id,
+                            title = noteModel.title,
+                            text = noteModel.text,
+                            date = noteModel.date,
+                            category = noteModel.category
+                        )
+                    )
+                )
             }
-            else return@observe
-        }
-
+        )
     }
 
-    override fun onClick(v: View?) {
-
-        if (v!=null){
-
-            when(v.id){
-
-                R.id.mb_add_button -> {
-                    val date        = getDate() + " " + getTime()
-                    sharedViewModel.setSpecificNote(Note(0, "", "", date, "no category"))
-                    navController.navigate(R.id.action_navigation_notes_to_navigation_add_note)
-                }
-
-                R.id.mb_del_button -> {sharedViewModel.deleteAll()}
-            }
-
-        }
-
+    private val linearLayoutManager by lazy {
+        LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
     }
 
-    private fun getDate(): String{
-
-        calendar                    = Calendar.getInstance()
-
-        val year                    = calendar.get(Calendar.YEAR)
-        val month                   = calendar.get(Calendar.MONTH)
-        val day                     = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return "${day}/${month}/${year}"
+    private val gridLayoutManager by lazy {
+        GridLayoutManager(activity, 2)
     }
 
-    private fun getTime(): String{
+    override fun setupViews() {
+        binding.apply {
 
-        calendar                    = Calendar.getInstance()
-
-        val hour                    = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute                  = calendar.get(Calendar.MINUTE)
-        val second                  = calendar.get(Calendar.SECOND)
-
-        var hourString              = ""
-        var minuteString            = ""
-        var secondString            = ""
-
-        hourString = if (hour < 10){
-            "0${hour}"
-        } else{
-            "$hour"
-        }
-        minuteString = if (minute < 10){
-            "0${minute}"
-        } else{
-            "$minute"
-        }
-        secondString = if (second < 10){
-            "0${second}"
-        } else{
-            "$second"
-        }
-
-        return "$hourString:$minuteString:$secondString"
-
-    }
-
-    private fun observeRecyclerViewLayoutManagerState(viewLifecycleOwner: LifecycleOwner) {
-        sharedViewModel.listGridViewBoolean.observe(viewLifecycleOwner){
-
-            if (it){
-                recyclerview.layoutManager  = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-            }else{
-                recyclerview.layoutManager  = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
-            }
+            rvNotes.adapter         = noteCardAdapter
 
         }
     }
 
-    private fun observeNotes(viewLifecycleOwner: LifecycleOwner){
+    override fun setupListeners() {
+        binding.apply {
+            mbAddButton.setOnClickListener { addButtonAction() }
+            mbDelButton.setOnClickListener { delButtonAction() }
+            etSearch.setOnClickListener {  }
 
-        sharedViewModel.notes.observe(viewLifecycleOwner) {
-
-            adapter                 = NoteAdapter(activity, it)
-            recyclerview.adapter    = adapter
-
-            adapter.onCardClick     = { item ->
-
-                sharedViewModel.setSpecificNote(item)
-                navController.navigate(R.id.action_navigation_notes_to_navigation_note_detail)
-
-            }
-        }
-    }
-
-//    private fun observeSearchedNotes(searchText: String, viewLifecycleOwner: LifecycleOwner){
+//            svSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+//                override fun onQueryTextSubmit(p0: String?): Boolean {
 //
-//        sharedViewModel.searchResults.observe(viewLifecycleOwner){
+//                    return false
+//                }
 //
-//            sharedViewModel.search(searchText)
+//                override fun onQueryTextChange(p0: String?): Boolean {
+//                    noteCardAdapter.filter.filter(p0)
+//                    noteCardAdapter.submitList(noteCardAdapter.noteModelFilteredList)
+//                    return false
+//                }
 //
-//        }
-//
-//    }
+//            })
+        }
+    }
 
-    private fun searchQueryListener(){
+    override fun setupObservers()
+    {
+        observeNoteRoomDatabase()
+        observePreferences()
+        observeNoteNumber()
+    }
 
-        searchView.queryHint            = getString(R.string.search_bar_hint)
+    private fun addButtonAction(){
+        viewModel.pushNote(
+            NoteModel(
+            id = 0,
+            title = "Test",
+            text = "This is a test",
+            date = getTime() + " " + getDate(),
+            category = "no category"
+            )
+        )
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // After clicking search button
-            override fun onQueryTextSubmit(query: String): Boolean {
+    }
 
-//                sharedViewModel.search(query)
-                return false
+    private fun delButtonAction(){
+
+        lifecycleScope.launch{
+            viewModel.deleteAll()
+        }
+
+    }
+
+    private fun observeNoteRoomDatabase(){
+
+        lifecycleScope.launch{
+
+            viewModel.notes.observe(viewLifecycleOwner){
+
+                    noteModelList -> noteCardAdapter.submitList(noteModelList)
+
             }
-            // While texting // input flow
-            override fun onQueryTextChange(newText: String): Boolean {
-                // This resets the notes list to display all notes if the query is
-                // cleared.
-                if (newText.isEmpty()){
 
-                    binding.nestedScrollView.visibility         = View.VISIBLE
-                    binding.nestedScrollViewSearch.visibility   = View.GONE
+        }
+    }
 
-                }else{
+    private fun observePreferences(){
 
-                    sharedViewModel.search(newText)
+        lifecycleScope.launch {
+
+            preferences.getLiveView().observe(viewLifecycleOwner){
+                if (it == AppPreferenceKeys.LIST){
+
+                    noteCardAdapter.layoutManagerType   = AppPreferenceKeys.LIST
+                    binding.rvNotes.layoutManager       = linearLayoutManager
+
+                }else if (it == AppPreferenceKeys.GRID){
+
+                    noteCardAdapter.layoutManagerType   = AppPreferenceKeys.GRID
+                    binding.rvNotes.layoutManager       = gridLayoutManager
 
                 }
-//                Log.i(newText, newText)
-//                Log.i("clear", "clear")
-                return false
             }
-        })
+
+        }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
+    private fun observeNoteNumber(){
+
+        lifecycleScope.launch {
+
+            viewModel.size.observe(viewLifecycleOwner){
+
+                numberOfNotes -> preferences.setNoteNumber(numberOfNotes)
+
+            }
+
+        }
     }
-
-
 
 }
 

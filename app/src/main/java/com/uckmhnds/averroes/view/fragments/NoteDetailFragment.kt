@@ -1,179 +1,90 @@
 package com.uckmhnds.averroes.view.fragments
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import com.uckmhnds.averroes.R
-import com.uckmhnds.averroes.application.AverroesApplication
+import android.util.Log
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.uckmhnds.averroes.databinding.FragmentNoteDetailBinding
-import com.uckmhnds.averroes.model.entities.Note
-import com.uckmhnds.averroes.view.dialogs.NoteCategoriesDialogFragment
-import com.uckmhnds.averroes.viewmodel.*
-import java.util.*
+import com.uckmhnds.averroes.databinding.FragmentNotesBinding
+import com.uckmhnds.averroes.domain.model.NoteModel
+import com.uckmhnds.averroes.view.fragments.base.BaseFragment
+import com.uckmhnds.averroes.viewmodel.NoteDetailViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-class NoteDetailFragment : Fragment(), View.OnClickListener, NoteCategoriesDialogFragment.NoteCategoriesDialogListener {
+@AndroidEntryPoint
+class NoteDetailFragment : BaseFragment<NoteDetailViewModel, FragmentNoteDetailBinding>(FragmentNoteDetailBinding::inflate){
 
-    private lateinit var binding: FragmentNoteDetailBinding
-    private lateinit var navController: NavController
-    private lateinit var noteToBeUpdated: Note
+    private val args by navArgs<NoteDetailFragmentArgs>()
 
-//    private val viewModel: NoteDetailViewModel by viewModels {
-//        NoteDetailViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
-//    }
+    override val viewModel  by viewModels<NoteDetailViewModel>()
 
-    private val sharedViewModel: SharedNoteViewModel by activityViewModels{
-        SharedNoteViewModelFactory((requireActivity().application as AverroesApplication).noteRepository)
-    }
+    override fun setupViews() {
+        binding.apply {
 
-    private lateinit var calendar: Calendar
+            etAddTitle.setText(args.noteModel.title)
+            etAddNote.setText(args.noteModel.text)
 
-    private lateinit var dialog: NoteCategoriesDialogFragment
+            tvDate.text             = args.noteModel.date
+            tvCategory.text         = args.noteModel.category
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
-        binding                     = FragmentNoteDetailBinding.inflate(inflater, container, false)
-
-        noteToBeUpdated             = sharedViewModel.getSpecificNote()
-
-        bindNoteView(noteToBeUpdated)
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        super.onViewCreated(view, savedInstanceState)
-
-        navController       = Navigation.findNavController(view)
-
-        // Top Item Container Listeners in order
-        binding.ivBackButton.setOnClickListener(this)
-        binding.ivPrevious.setOnClickListener(this)
-        binding.ivForward.setOnClickListener(this)
-        binding.ivAddNote.setOnClickListener(this)
-
-        // Middle Item Container Listener (Note category)
-        binding.llSelectCategory.setOnClickListener(this)
-
-    }
-
-    override fun onClick(v: View?) {
-
-        if (v!=null){
-
-            when(v.id){
-
-                R.id.iv_add_note -> {
-
-                    noteToBeUpdated.title       = binding.etAddTitle.text.toString()
-                    noteToBeUpdated.text        = binding.etAddNote.text.toString()
-                    noteToBeUpdated.category    = binding.tvCategory.text.toString()
-                    noteToBeUpdated.date        = getDate() + " " + getTime()
-
-                    sharedViewModel.update(noteToBeUpdated)
-
-                }
-
-                R.id.iv_back_button -> {
-
-                    navController.navigate(R.id.action_navigation_note_detail_to_navigation_notes)
-
-                }
-
-                R.id.ll_select_category -> {
-
-                    showNoteCategoriesDialogFragment()
-
-                }
-
-                R.id.iv_forward -> {
-
-                }
-
-                R.id.iv_previous -> {
-
-                }
-
-            }
         }
     }
 
-    private fun getDate(): String{
-
-        calendar                    = Calendar.getInstance()
-
-        val year                    = calendar.get(Calendar.YEAR)
-        val month                   = calendar.get(Calendar.MONTH)
-        val day                     = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return "${day}/${month}/${year}"
+    override fun setupListeners() {
+        binding.apply {
+            ivAddNote.setOnClickListener { addButtonAction() }
+            ivBackButton.setOnClickListener { backButtonAction() }
+            llSelectCategory.setOnClickListener { categorySelectAction() }
+            ivPrevious.setOnClickListener { previousButtonAction() }
+            ivForward.setOnClickListener { forwardButtonAction() }
+        }
     }
 
-    private fun getTime(): String{
+    override fun setupObservers() {
+    }
 
-        calendar                    = Calendar.getInstance()
+    private fun updateNoteModel(noteModel: NoteModel){
 
-        val hour                    = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute                  = calendar.get(Calendar.MINUTE)
-        val second                  = calendar.get(Calendar.SECOND)
+        lifecycleScope.launch{
 
-        var hourString              = ""
-        var minuteString            = ""
-        var secondString            = ""
+            viewModel.updateNote(noteModel)
 
-        hourString = if (hour < 10){
-            "0${hour}"
-        } else{
-            "$hour"
-        }
-        minuteString = if (minute < 10){
-            "0${minute}"
-        } else{
-            "$minute"
-        }
-        secondString = if (second < 10){
-            "0${second}"
-        } else{
-            "$second"
         }
 
-        return "$hourString:$minuteString:$secondString"
+    }
+
+    private fun addButtonAction(){
+
+        updateNoteModel(
+            NoteModel(
+
+                id          = args.noteModel.id,
+                title       = binding.etAddTitle.text.toString(),
+                text        = binding.etAddNote.text.toString(),
+                date        = binding.tvDate.text.toString(),
+                category    = binding.tvCategory.text.toString()
+
+            )
+        )
+    }
+
+    private fun backButtonAction(){
+
+        navigateWithAction(
+            NoteDetailFragmentDirections.actionNoteDetailToNotes()
+        )
+    }
+
+    private fun categorySelectAction(){
 
     }
 
-    private fun showNoteCategoriesDialogFragment(){
-
-        // Create an instance of the dialog fragment and show it
-
-        dialog                      = NoteCategoriesDialogFragment()
-
-        dialog.show(childFragmentManager, "NoteCategoriesDialogFragment")
+    private fun previousButtonAction(){
 
     }
 
-    override fun onNoteCategoryClick(category: String) {
-
-        binding.tvCategory.text     = category
-
-        dialog.dismiss()
-
-    }
-
-    private fun bindNoteView(note: Note){
-
-        binding.etAddNote.setText(note.text)
-        binding.etAddTitle.setText(note.title)
-
-        binding.tvCategory.text     = note.category
-        binding.tvDate.text         = note.date
+    private fun forwardButtonAction(){
 
     }
 

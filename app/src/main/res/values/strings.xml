@@ -24,4 +24,7 @@
     <string name="settings">Settings</string>
 
     <string name="search_bar_hint">Search</string>
+
+    <string name="number_of_notes">%1$s Notes</string>
+    <string name="number_of_todos">%1$s To-dos</string>
 </resources>

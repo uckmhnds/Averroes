@@ -1,12 +1,11 @@
 package com.uckmhnds.averroes.view.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.uckmhnds.averroes.databinding.TodoCardBinding
-import com.uckmhnds.averroes.model.entities.Todo
+import com.uckmhnds.averroes.data.room.entities.Todo
 
 class TodoAdapter(
     private val activity: FragmentActivity?,

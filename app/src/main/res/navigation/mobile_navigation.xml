@@ -11,21 +11,8 @@
         android:label="@string/title_notes"
         tools:layout="@layout/fragment_notes" >
         <action
-            android:id="@+id/action_navigation_notes_to_navigation_add_note"
-            app:destination="@id/navigation_add_note" />
-        <action
-            android:id="@+id/action_navigation_notes_to_navigation_note_detail"
+            android:id="@+id/action_notes_to_note_detail"
             app:destination="@id/navigation_note_detail" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_add_note"
-        android:name="com.uckmhnds.averroes.view.fragments.AddNoteFragment"
-        android:label="@string/title_add_note"
-        tools:layout="@layout/fragment_add_note" >
-        <action
-            android:id="@+id/action_navigation_add_note_to_navigation_notes"
-            app:destination="@id/navigation_notes" />
     </fragment>
 
     <fragment
@@ -34,8 +21,13 @@
         android:label="@string/title_note_detail"
         tools:layout="@layout/fragment_note_detail" >
         <action
-            android:id="@+id/action_navigation_note_detail_to_navigation_notes"
+            android:id="@+id/action_note_detail_to_notes"
             app:destination="@id/navigation_notes" />
+
+        <argument
+            android:name="noteModel"
+            app:argType="com.uckmhnds.averroes.domain.model.NoteModel" />
+
     </fragment>
 
     <fragment
