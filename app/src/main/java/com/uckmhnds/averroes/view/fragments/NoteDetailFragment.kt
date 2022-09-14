@@ -7,17 +7,22 @@ import androidx.navigation.fragment.navArgs
 import com.uckmhnds.averroes.databinding.FragmentNoteDetailBinding
 import com.uckmhnds.averroes.databinding.FragmentNotesBinding
 import com.uckmhnds.averroes.domain.model.NoteModel
+import com.uckmhnds.averroes.view.dialogs.NoteCategoriesDialogFragment
 import com.uckmhnds.averroes.view.fragments.base.BaseFragment
 import com.uckmhnds.averroes.viewmodel.NoteDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class NoteDetailFragment : BaseFragment<NoteDetailViewModel, FragmentNoteDetailBinding>(FragmentNoteDetailBinding::inflate){
+class NoteDetailFragment : BaseFragment<NoteDetailViewModel, FragmentNoteDetailBinding>(FragmentNoteDetailBinding::inflate),
+    NoteCategoriesDialogFragment.NoteCategoriesDialogListener
+{
 
     private val args by navArgs<NoteDetailFragmentArgs>()
 
     override val viewModel  by viewModels<NoteDetailViewModel>()
+
+    private lateinit var dialog: NoteCategoriesDialogFragment
 
     override fun setupViews() {
         binding.apply {
@@ -35,9 +40,10 @@ class NoteDetailFragment : BaseFragment<NoteDetailViewModel, FragmentNoteDetailB
         binding.apply {
             ivAddNote.setOnClickListener { addButtonAction() }
             ivBackButton.setOnClickListener { backButtonAction() }
-            llSelectCategory.setOnClickListener { categorySelectAction() }
+            llSelectCategory.setOnClickListener { showNoteCategoriesDialogFragment() }
             ivPrevious.setOnClickListener { previousButtonAction() }
             ivForward.setOnClickListener { forwardButtonAction() }
+
         }
     }
 
@@ -76,15 +82,33 @@ class NoteDetailFragment : BaseFragment<NoteDetailViewModel, FragmentNoteDetailB
         )
     }
 
-    private fun categorySelectAction(){
-
-    }
-
     private fun previousButtonAction(){
 
     }
 
     private fun forwardButtonAction(){
+
+    }
+
+    private fun showNoteCategoriesDialogFragment(){
+
+        // Create an instance of the dialog fragment and show it
+
+        dialog                      = NoteCategoriesDialogFragment()
+
+        dialog.show(childFragmentManager, "NoteCategoriesDialogFragment")
+
+    }
+
+    // Overridden interface from NoteCategoriesDialogFragment
+    override fun onNoteCategoryClick(category: String) {
+
+        binding.apply {
+
+            tvCategory.text         = category
+        }
+
+        dialog.dismiss()
 
     }
 
